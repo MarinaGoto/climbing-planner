@@ -41,6 +41,8 @@ export default function MapSelector({
   selectedLocation,
   setSelectedLocation,
 }: MapSelectorProps) {
+  const defaultCenter: [number, number] = [53.119, -4.132];
+
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between gap-3">
@@ -60,7 +62,11 @@ export default function MapSelector({
       </div>
       <div className="overflow-hidden rounded-lg border border-gray-200">
         <MapContainer
-          center={[59.91, 10.75]}
+          center={
+            selectedLocation
+              ? [selectedLocation.lat, selectedLocation.lon]
+              : defaultCenter
+          }
           zoom={10}
           scrollWheelZoom={false}
           style={{ width: "100%", height: "260px" }}
