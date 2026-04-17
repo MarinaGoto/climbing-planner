@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import llanData from "@/data/llanberis.json";
 import dynamic from "next/dynamic";
 const MapSelector = dynamic(() => import("../MapSelector"), { ssr: false });
+import PlaceSearch from "@/src/components/PlaceSearch";
 
 type WeatherHour = {
   time: string;
@@ -83,65 +84,67 @@ export default function Home() {
     lat: number;
     lon: number;
   } | null>({ lat: 53.119, lon: -4.132 });
+  // selectedPlace is the user-picked place from PlaceSearch (prepares for crags)
+  const [selectedPlace, setSelectedPlace] = useState<{
+    name: string;
+    lat: number;
+    lon: number;
+  } | null>(null);
   const [forecast, setForecast] = useState<WeatherHour[]>([]);
   const [loading, setLoading] = useState(false);
   const [weatherIcon, setWeatherIcon] = useState("");
   const [windDirection, setWindDirection] = useState("");
+  // Weather is fetched on-demand when user clicks "Show conditions"
 
-  useEffect(() => {
-    if (!selectedLocation) return;
+  const handleShowConditions = async () => {
+    const place = selectedPlace;
+    if (!place) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/weather?lat=${place.lat}&lon=${place.lon}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const hourly: WeatherHour[] = data.hourly || [];
+      const today = new Date().toISOString().slice(0, 10);
+      const todays = hourly.filter((h) => h.time.slice(0, 10) === today);
+      const useHours = todays.length > 0 ? todays : hourly;
+      setForecast(useHours);
 
-    const fetchWeather = async () => {
-      try {
-        const res = await fetch(
-          `/api/weather?lat=${selectedLocation.lat}&lon=${selectedLocation.lon}`,
+      const firstHour = useHours[0];
+      if (firstHour) {
+        setWeatherIcon(
+          firstHour.climbability.label === "perfect"
+            ? "☀️"
+            : firstHour.climbability.label === "good"
+              ? "🌤️"
+              : firstHour.climbability.label === "ok"
+                ? "⛅"
+                : "🌧️",
         );
-        if (!res.ok) return;
-        const data = await res.json();
-        const hourly: WeatherHour[] = data.hourly || [];
-        // filter to entries for the current day (local)
-        const today = new Date().toISOString().slice(0, 10);
-        const todays = hourly.filter((h) => h.time.slice(0, 10) === today);
-        const useHours = todays.length > 0 ? todays : hourly;
-        setForecast(useHours);
-
-        const firstHour = useHours[0];
-        if (firstHour) {
-          setWeatherIcon(
-            firstHour.climbability.label === "perfect"
-              ? "☀️"
-              : firstHour.climbability.label === "good"
-                ? "🌤️"
-                : firstHour.climbability.label === "ok"
-                  ? "⛅"
-                  : "🌧️",
-          );
-          const deg = firstHour.windDeg;
-          setWindDirection(
-            deg >= 337.5 || deg < 22.5
-              ? "N"
-              : deg < 67.5
-                ? "NE"
-                : deg < 112.5
-                  ? "E"
-                  : deg < 157.5
-                    ? "SE"
-                    : deg < 202.5
-                      ? "S"
-                      : deg < 247.5
-                        ? "SW"
-                        : deg < 292.5
-                          ? "W"
-                          : "NW",
-          );
-        }
-      } catch (error) {
-        console.error(error);
+        const deg = firstHour.windDeg;
+        setWindDirection(
+          deg >= 337.5 || deg < 22.5
+            ? "N"
+            : deg < 67.5
+              ? "NE"
+              : deg < 112.5
+                ? "E"
+                : deg < 157.5
+                  ? "SE"
+                  : deg < 202.5
+                    ? "S"
+                    : deg < 247.5
+                      ? "SW"
+                      : deg < 292.5
+                        ? "W"
+                        : "NW",
+        );
       }
-    };
-
-    fetchWeather();
-  }, [selectedLocation]);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -213,10 +216,31 @@ export default function Home() {
         loading={loading}
       />
       <main className="flex-1 p-5 space-y-6">
-        <MapSelector
-          selectedLocation={selectedLocation}
-          setSelectedLocation={setSelectedLocation}
-        />
+        <div className="space-y-4">
+          <PlaceSearch
+            onSelect={(p) =>
+              setSelectedPlace({ name: p.name, lat: p.lat, lon: p.lon })
+            }
+          />
+
+          <div className="flex items-center gap-3">
+            <button
+              className={`px-3 py-2 rounded bg-primary text-white disabled:opacity-50`}
+              onClick={handleShowConditions}
+              disabled={!selectedPlace || loading}
+            >
+              {loading ? "Loading…" : "Show conditions"}
+            </button>
+            {selectedPlace ? (
+              <div className="text-sm text-slate-600">
+                Selected: {selectedPlace.name} ({selectedPlace.lat.toFixed(3)},{" "}
+                {selectedPlace.lon.toFixed(3)})
+              </div>
+            ) : null}
+          </div>
+
+          <MapSelector place={selectedPlace} />
+        </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="text-center space-y-1">
@@ -229,6 +253,62 @@ export default function Home() {
           </div>
           <div className="mt-4 text-center text-foreground text-base">
             Conditions: {weatherIcon} Wind: {windDirection}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <h2 className="text-lg font-medium text-foreground">Weather</h2>
+          <div className="mt-3">
+            <h3 className="text-sm font-semibold">Today (hourly)</h3>
+            <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-1">
+              {forecast?.slice(0, 12).map((h, i) => (
+                <div key={i} className="p-0.5 border rounded text-[10px]">
+                  <div className="font-semibold text-[10px]">
+                    {new Date(h.time).getHours()}:00
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px]">
+                    <span>{(h.rain || 0) > 0 ? "🌧️" : "☀️"}</span>
+                    <span>{Math.round(h.temp)}°C</span>
+                  </div>
+                  <div className="text-[9px]">
+                    {Math.round(h.windSpeed)} km/h
+                  </div>
+                  <div className="text-[9px]">rain: {h.rain || 0} mm</div>
+                </div>
+              ))}
+            </div>
+
+            {/** Tomorrow summary from daily data not currently returned by /api/weather; try to show next day's summary if available in forecast array */}
+            {false ? null : (
+              <div className="mt-4">
+                {/* If daily available, show summary; fallback: show next 12 hours as "tomorrow" */}
+                {false ? (
+                  <div />
+                ) : (
+                  <div>
+                    <h3 className="text-sm font-semibold">
+                      Tomorrow (next hours)
+                    </h3>
+                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-1">
+                      {forecast?.slice(12, 24).map((h, i) => (
+                        <div
+                          key={i}
+                          className="p-0.5 border rounded text-[10px]"
+                        >
+                          <div className="font-semibold text-[10px]">
+                            {new Date(h.time).getHours()}:00
+                          </div>
+                          <div className="flex items-center gap-1 text-[11px]">
+                            <span>{(h.rain || 0) > 0 ? "🌧️" : "☀️"}</span>
+                            <span>{Math.round(h.temp)}°C</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
