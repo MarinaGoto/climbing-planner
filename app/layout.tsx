@@ -1,23 +1,12 @@
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import type { FunctionComponent, ReactNode } from "react";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-export const metadata: Metadata = {
-  title: "Where to Climb?",
-  description:
-    "Find the best climbing spots based on your level and conditions",
-};
-
-export default function RootLayout({
+const RootLayout: FunctionComponent<{ children: ReactNode }> = ({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}) => {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
@@ -25,4 +14,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
