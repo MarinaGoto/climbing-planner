@@ -1,4 +1,4 @@
-export type RockType = "granite" | "limestone" | "sandstone" | "slate";
+export type RockType = "granite" | "rhyolite" | "limestone" | "sandstone" | "slate";
 export type Style = "slab" | "vertical" | "overhang";
 export type Exposure = "low" | "medium" | "high";
 export type Special = "sea_cliff" | "quarry" | "cave";
@@ -7,7 +7,8 @@ export type Special = "sea_cliff" | "quarry" | "cave";
 export interface Crag {
   id: string;
   name: string;
-  orientation: number; // degrees (S = 180)
+  link: string;
+  orientation: string | undefined; // degrees (S = 180)
   rockType: RockType;
   style: Style;
   exposure: Exposure;

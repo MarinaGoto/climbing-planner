@@ -17,13 +17,24 @@ function dryness(ctx: Context): ScorePart {
     reason = "rain over last days";
   }
 
-  if (ctx.rockType === "slate") score += 10;
-  if (ctx.rockType === "sandstone") score -= 15;
+  if (ctx.rockType === "slate") {
+    score += 10;
+    reason = "slate is a fast-drying rock"
+  };
+  if (ctx.rockType === "sandstone") { 
+    score -= 15;
+    reason = "avoid sandstone when wet"
+  };
   if (ctx.rockType === "limestone") score -= 10;
   if (ctx.rockType === "granite") score -= 10;
+  if (ctx.rockType === "rhyolite") score -= 10;
 
 
-  if (style === "overhang") score += 15;
+
+  if (style === "overhang") {
+    score += 15;
+    reason = "overhang stays dry";
+  };
   if (style === "slab") score -= 10;
 
   return { value: score, reason };
@@ -40,30 +51,15 @@ function windExposure(ctx: Context): ScorePart {
   }
 
   if (effectiveAngle < 60) {
-    return { value: 15, reason: "wind drying the crag" };
+    return { value: 15, reason: "wind hitting the face — dries fast" };
   }
 
   if (effectiveAngle > 120) {
     return { value: -5, reason: "sheltered from wind" };
   }
 
-  return { value: 5, reason: "partial wind exposure" };
+  return { value: 5, reason: "some airflow — helps a bit" };
 }
-
-
-// Remove this for now because that's more about safety
-// function rockFactor(ctx: Context): ScorePart {
-//   switch (ctx.rockType) {
-//     case "granite":
-//       return { value: 5, reason: "solid rock" };
-//     case "slate":
-//       return { value: 8, reason: "fast drying" };
-//     case "limestone":
-//       return { value: -5, reason: "can seep" };
-//     case "sandstone":
-//       return { value: -20, reason: "fragile when wet" };
-//   }
-// }
 
 export function computeScore(ctx: Context): Result {
   const parts = [dryness(ctx), windExposure(ctx)];

@@ -8,9 +8,18 @@ const CragCard: FunctionComponent<PropsWithChildren<Props>> = ({
   ...props
 }) => {
   return (
-    <article className="mb-5">
-      <div className="text-lg font-semibold text-[#2f2f2f]">{props.name}</div>
-      <div className="text-base text-[#2f2f2f] mt-1">
+    <article className="mb-5 border border-gray-200 rounded-md p-4 text-sm">
+      <div className="text-base font-semibold text-[#2f2f2f]">
+        <a
+          href={props.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#2f2f2f] hover:underline"
+        >
+          {props.name}
+        </a>
+      </div>
+      <div className="text-sm text-[#2f2f2f] mt-1">
         {props.score} — {props.label}
       </div>
 
