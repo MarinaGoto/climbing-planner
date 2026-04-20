@@ -1,7 +1,7 @@
 import { Context, Result, ScorePart } from "@/types/climb";
 
 function dryness(ctx: Context): ScorePart {
-  const { rainLast24h, rainLast72h, style, drainage } = ctx;
+  const { rainLast24h, rainLast72h, style } = ctx;
 
   let score = 0;
   let reason = "dry";
@@ -25,9 +25,6 @@ function dryness(ctx: Context): ScorePart {
 
   if (style === "overhang") score += 15;
   if (style === "slab") score -= 10;
-
-  if (drainage === "fast") score += 10;
-  if (drainage === "slow") score -= 10;
 
   return { value: score, reason };
 }
