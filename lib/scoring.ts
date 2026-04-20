@@ -61,6 +61,9 @@ function windExposure(ctx: Context): ScorePart {
   return { value: 5, reason: "some airflow — helps a bit" };
 }
 
+
+// TODO: if there's no rain and no rain last 72 h - do not take orientation/angle into calculation 
+// TODO: think how you can get data about vigitation around the crag
 export function computeScore(ctx: Context): Result {
   const parts = [dryness(ctx), windExposure(ctx)];
 

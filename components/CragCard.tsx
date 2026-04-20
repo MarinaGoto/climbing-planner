@@ -1,39 +1,55 @@
-import type { Crag, Result } from "@/types/climb";
+import type { ClimbabilityResult, Crag } from "@/types/climb";
 import type { FunctionComponent, PropsWithChildren } from "react";
 
-type Props = Crag & Result;
+type Props = Crag & ClimbabilityResult;
+
+const getScoreColor = (score: number | string) => {
+  const s = Number(score) || 0;
+  if (s > 70) return "#20974d"; // green
+  if (s > 40) return "#92400e"; // amber
+  return "#7f1d1d"; // red
+};
 
 const CragCard: FunctionComponent<PropsWithChildren<Props>> = ({
   children,
   ...props
 }) => {
+  const scoreColor = getScoreColor(props.score);
+
   return (
-    <article className="mb-5 border border-gray-200 rounded-md p-4 text-sm">
-      <div className="text-base font-semibold text-[#2f2f2f]">
-        <a
-          href={props.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#2f2f2f] hover:underline"
+    <div className="crag-card mb-3.5 border border-[#e5e5e5] rounded-xl py-4 px-4.5 bg-[#fafafa] hover:bg-[#f5f5f5] transition-colors duration-200 text-sm">
+      <div className="crag-header flex justify-between items-baseline">
+        <h3 className="text-base font-semibold m-0 text-[#2f2f2f]">
+          <a
+            href={props.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#2f2f2f] hover:underline"
+          >
+            {props.name}
+          </a>
+        </h3>
+
+        <div
+          className="score text-[22px] font-semibold"
+          style={{ color: scoreColor }}
         >
-          {props.name}
-        </a>
-      </div>
-      <div className="text-sm text-[#2f2f2f] mt-1">
-        {props.score} — {props.label}
+          {props.score}
+        </div>
       </div>
 
-      <ul className="text-[#2f2f2f] mt-2 pl-5">
-        {props.breakdown.map((b, i) => (
-          <li key={i}>
-            {b.value > 0 ? "+" : ""}
-            {b.value} — {b.reason}
-          </li>
-        ))}
-      </ul>
+      <div className="summary mt-1.5 text-sm text-[#374151]">
+        {props.reason}
+      </div>
+
+      <div className="details mt-1.5 text-[13px] text-[#9ca3af]">
+        {props.rockType.charAt(0).toUpperCase() + props.rockType.slice(1)} ·{" "}
+        {props.style} · faces {props.orientation}
+        {props.exposure === "high" && " · exposed"}
+      </div>
 
       {children}
-    </article>
+    </div>
   );
 };
 

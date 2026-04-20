@@ -7,8 +7,9 @@ export type Special = "sea_cliff" | "quarry" | "cave";
 export interface Crag {
   id: string;
   name: string;
+  description?: string;
   link: string;
-  orientation: string | undefined; // degrees (S = 180)
+  orientation: "N" | "S" | "E" | "W"; // "N", "S", "E", "W"
   rockType: RockType;
   style: Style;
   exposure: Exposure;
@@ -19,17 +20,16 @@ export interface Weather {
   currentlyRaining: boolean;
   currentlySun: boolean;
   rainLast24h: number;
-  rainLast72h: number;
   windSpeed: number;
-  windDirection: number;
+  windDirection: "N" | "S" | "E" | "W";
 }
 
 export interface Context {
   rainLast24h: number;
   rainLast72h: number;
   windSpeed: number;
-  windDirection: number;
-  cragOrientation: number;
+  windDirection: "N" | "S" | "E" | "W";
+  cragOrientation: "N" | "S" | "E" | "W";
   rockType: RockType;
   style: Style;
   special?: Special;
@@ -40,8 +40,7 @@ export interface ScorePart {
   reason: string;
 }
 
-export interface Result {
+export interface ClimbabilityResult {
   score: number;
-  label: "excellent" | "good" | "ok" | "poor" | "no-go";
-  breakdown: ScorePart[];
+  reason: string;
 }

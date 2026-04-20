@@ -8,7 +8,7 @@ export const crags: Crag[] = [
     orientation: "S",
     rockType: "rhyolite",
     style: "vertical",
-    exposure: "high"
+    exposure: "high" // TODO: take this into scoring
   },
   {
     id: "grochan",
@@ -23,8 +23,17 @@ export const crags: Crag[] = [
     id: "australia",
     name: "Australia",
     link: "https://www.ukclimbing.com/logbook/crags/australia-10/",
-    orientation: undefined,
+    orientation: "S",
     rockType: "slate",
+    style: "slab",
+    exposure: "high"
+  },
+  {
+    id: "tarw",
+    name: "Clogwyn y Tarw (The Gribin Facet)",
+    link: "https://www.ukclimbing.com/logbook/crags/clogwyn_y_tarw_the_gribin_facet-495/",
+    orientation: "N",
+    rockType: "rhyolite",
     style: "slab",
     exposure: "high"
   },
@@ -35,16 +44,24 @@ export const crags: Crag[] = [
     orientation: "E",
     rockType: "limestone",
     style: "overhang",
-    exposure: "high" // Add altitude instead of exposure
+    exposure: "low" // Add altitude instead of exposure
   },
+  {
+    id: "penmaen_head",
+    name: "Penmaen Head",
+    description: "It dries quickly and doesn't suffer from any long term seepage. The Penmaenrhos Wall may give some dry climbing in light rain, and is also sheltered making it a good bet if retreating from the wet and windy mountain crags.",
+    link: "https://www.ukclimbing.com/logbook/crags/penmaen_head-9203/",
+    orientation: "W",
+    rockType: "limestone",
+    style: "vertical",
+    exposure: "high" // Reason: sea cliff
+  }
 ];
 
 export const weather: Weather = {
-  currentlyRaining: true,
-  currentlySun: false,
-  rainLast24h: 3,
-  rainLast72h: 15,
-  windSpeed: 6,
-  windDirection: 180,
-
+  currentlyRaining: false,
+  currentlySun: true,
+  rainLast24h: 0,
+  windSpeed: 7, // m/s
+  windDirection: "S",
 };

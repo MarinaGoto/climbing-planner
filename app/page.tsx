@@ -1,53 +1,35 @@
+"use client";
+
 import { crags, weather } from "@/lib/data";
 import { computeScore } from "@/lib/scoring";
 import CragCard from "@/components/CragCard";
-import type { FunctionComponent } from "react";
-
-function orientationToDegrees(o?: string | number | null): number {
-  if (o == null) return 0;
-  const s = String(o).trim();
-  // numeric string (degrees)
-  if (/^-?\d+(?:\.\d+)?$/.test(s)) {
-    const n = Math.round(Number(s)) % 360;
-    return (n + 360) % 360;
-  }
-  switch (s.toUpperCase()) {
-    case "N":
-      return 0;
-    case "E":
-      return 90;
-    case "S":
-      return 180;
-    case "W":
-      return 270;
-    default:
-      return 0;
-  }
-}
-
-function degreesToCardinal(d?: number | null): string {
-  if (d == null) return "?";
-  const deg = ((Math.round(d) % 360) + 360) % 360;
-  if (deg < 45 || deg >= 315) return "N";
-  if (deg < 135) return "E";
-  if (deg < 225) return "S";
-  return "W";
-}
+import React, { useState, type FunctionComponent } from "react";
+import { calculateClimbability } from "@/utils/calculateClimbability";
 
 const Home: FunctionComponent = () => {
+  const [model, setModel] = useState<"wind-only" | "wind+dryness">("wind-only");
+
   const results = crags.map((crag) => {
     const ctx = {
       ...weather,
-      cragOrientation: orientationToDegrees(crag.orientation),
-      rockType: crag.rockType,
-      style: crag.style,
+      cragOrientation: crag.orientation,
     };
 
-    const result = computeScore(ctx);
+    const result = calculateClimbability({
+      windSpeed: ctx.windSpeed,
+      windDirection: ctx.windDirection,
+      cragFacing: ctx.cragOrientation,
+    });
+
+    const finalResult =
+      model === "wind-only"
+        ? result
+        : { score: Math.max(0, result.score - 30), reason: "Dryness penalty applied" };
 
     return {
       ...crag,
-      ...result,
+      score: finalResult.score,
+      reason: finalResult.reason,
     };
   });
 
@@ -55,15 +37,31 @@ const Home: FunctionComponent = () => {
 
   return (
     <main className="max-w-160 mx-auto my-10 p-6 font-sans bg-[#f7f6f2] text-[#2f2f2f] space-y-6">
-      <h1 className="text-2xl md:text-3xl font-semibold">Climbability score</h1>
-      <div className="text-sm text-[#565656] mt-2">
-        {weather.currentlyRaining
-          ? "Raining"
-          : weather.currentlySun
-            ? "Sunny"
-            : "Dry"}{" "}
-        • {weather.rainLast24h}mm (24h) • Wind {weather.windSpeed} km/h from{" "}
-        {degreesToCardinal(weather.windDirection)}
+      <div className="page-header mb-5 flex justify-between items-start">
+        <div>
+          <h1 className="text-[22px] mb-1 font-semibold">Climbability score</h1>
+          <div className="meta text-sm text-[#6b7280]">
+            {weather.currentlyRaining
+              ? "Raining"
+              : weather.currentlySun
+                ? "Sunny"
+                : "Dry"}{" "}
+            • {weather.rainLast24h}mm (24h) • Wind {weather.windSpeed} km/h from{" "}
+            {weather.windDirection}
+          </div>
+        </div>
+
+        <div className="ml-4">
+          <label className="text-sm text-[#6b7280] mr-2">Models</label>
+          <select
+            value={model}
+            onChange={(e) => setModel(e.target.value as any)}
+            className="text-sm border border-gray-200 rounded px-2 py-1 bg-white"
+          >
+            <option value="wind-only">wind-only</option>
+            <option value="wind+dryness">wind + dryness penalty</option>
+          </select>
+        </div>
       </div>
 
       {results.map((crag) => (
