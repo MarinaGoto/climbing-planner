@@ -1,6 +1,6 @@
-import { Weather } from './types';
+import { Weather } from '@/types/climb';
 
-export function getWeather(date: string): Weather {
+export function getWeather(_date: string): Weather {
   // For MVP, return hardcoded weather data
   // In future, integrate with real weather API
   return {

@@ -1,5 +1,8 @@
 export type RockType = "granite" | "limestone" | "sandstone" | "slate";
 export type Style = "slab" | "vertical" | "overhang";
+export type Exposure = "low" | "medium" | "high";
+export type Special = "sea_cliff" | "quarry" | "cave";
+
 
 export interface Crag {
   id: string;
@@ -7,10 +10,13 @@ export interface Crag {
   orientation: number; // degrees (S = 180)
   rockType: RockType;
   style: Style;
-  drainage: "fast" | "medium" | "slow";
+  exposure: Exposure;
+  special?: Special;
 }
 
 export interface Weather {
+  currentlyRaining: boolean;
+  currentlySun: boolean;
   rainLast24h: number;
   rainLast72h: number;
   windSpeed: number;
@@ -25,7 +31,7 @@ export interface Context {
   cragOrientation: number;
   rockType: RockType;
   style: Style;
-  drainage: "fast" | "medium" | "slow";
+  special?: Special;
 }
 
 export interface ScorePart {
