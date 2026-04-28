@@ -1,4 +1,4 @@
-import { Context, Result, ScorePart } from "@/types/climb";
+import { Context, ScorePart } from "@/types/climb";
 
 function dryness(ctx: Context): ScorePart {
   const { rainLast24h, rainLast72h, style } = ctx;

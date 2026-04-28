@@ -1,7 +1,7 @@
 export type RockType = "granite" | "rhyolite" | "limestone" | "sandstone" | "slate";
 export type Style = "slab" | "vertical" | "overhang";
-export type Exposure = "low" | "medium" | "high";
 export type Special = "sea_cliff" | "quarry" | "cave";
+export type Orientation = "N" | "S" | "E" | "W" | "NE" | "SE" | "SW" | "NW";
 
 
 export interface Crag {
@@ -9,10 +9,10 @@ export interface Crag {
   name: string;
   description?: string;
   link: string;
-  orientation: "N" | "S" | "E" | "W"; // "N", "S", "E", "W"
+  orientation: Orientation;
   rockType: RockType;
   style: Style;
-  exposure: Exposure;
+  altitude: number; // in meters a.s.l.
   special?: Special;
 }
 
@@ -21,15 +21,15 @@ export interface Weather {
   currentlySun: boolean;
   rainLast24h: number;
   windSpeed: number;
-  windDirection: "N" | "S" | "E" | "W";
+  windDirection: Orientation;
 }
 
 export interface Context {
   rainLast24h: number;
   rainLast72h: number;
   windSpeed: number;
-  windDirection: "N" | "S" | "E" | "W";
-  cragOrientation: "N" | "S" | "E" | "W";
+  windDirection: Orientation;
+  cragOrientation: Orientation;
   rockType: RockType;
   style: Style;
   special?: Special;

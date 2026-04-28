@@ -1,9 +1,8 @@
 "use client";
 
 import { crags, weather } from "@/lib/data";
-import { computeScore } from "@/lib/scoring";
 import CragCard from "@/components/CragCard";
-import React, { useState, type FunctionComponent } from "react";
+import { useState, type FunctionComponent } from "react";
 import { calculateClimbability } from "@/utils/calculateClimbability";
 
 const Home: FunctionComponent = () => {
@@ -24,7 +23,10 @@ const Home: FunctionComponent = () => {
     const finalResult =
       model === "wind-only"
         ? result
-        : { score: Math.max(0, result.score - 30), reason: "Dryness penalty applied" };
+        : {
+            score: Math.max(0, result.score - 30),
+            reason: "Dryness penalty applied",
+          };
 
     return {
       ...crag,
@@ -41,12 +43,7 @@ const Home: FunctionComponent = () => {
         <div>
           <h1 className="text-[22px] mb-1 font-semibold">Climbability score</h1>
           <div className="meta text-sm text-[#6b7280]">
-            {weather.currentlyRaining
-              ? "Raining"
-              : weather.currentlySun
-                ? "Sunny"
-                : "Dry"}{" "}
-            • {weather.rainLast24h}mm (24h) • Wind {weather.windSpeed} km/h from{" "}
+            {weather.rainLast24h}mm (24h) • Wind {weather.windSpeed} km/h from{" "}
             {weather.windDirection}
           </div>
         </div>
@@ -65,7 +62,7 @@ const Home: FunctionComponent = () => {
       </div>
 
       {results.map((crag) => (
-        <CragCard key={crag.id} {...crag} />
+        <CragCard key={crag.id} {...crag} weather={weather} />
       ))}
     </main>
   );

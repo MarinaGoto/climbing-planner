@@ -36,7 +36,6 @@ We calculate how directly the wind hits the crag.
 This is a heuristic model (основанный на интуиции).
 
 
-
 2. **Wind strength (normalized)**
 
 Wind speed is scaled to a value between 0 and 1:
@@ -59,3 +58,8 @@ This means:
 - Only a good combination of both gives a high score
 
 Final output is scaled to 0–100.
+
+**Wind only model assumes:**
+
+- wind always helps drying
+- more wind = always better
